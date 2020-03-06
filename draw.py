@@ -7,6 +7,7 @@
 # specified date/time range.
 
 import tdclient
+import argparse
 
 # Well, first thing first, I need a skeleton of application
 
@@ -30,59 +31,46 @@ MIN_MAX_TIME = 0
 MIN_MIN_TIME = 0
 MIN_LIMIT = 0
 
+# $ query -f csv -e hive -c "my_col1,my_col2,my_col5" -m 1427347140 -M 1427350725 -l 100 my_db my_table
+parser = argparse.ArgumentParser()
+parser.add_argument("db_name",
+                    help='"string" Name of database to connect')
+parser.add_argument("table_name",
+                    help='"string" Name of table for query')
+parser.add_argument("-c", "--col_list",
+                    help='List of columns to query, comma separated. By default everything')
+parser.add_argument("-m", "--min_time",
+                    help='Time FROM for rows, by default NULL', type=int)
+parser.add_argument("-M", "--max_time",
+                    help='Time TO fo rows, by default NULL', type=int)
+parser.add_argument("-e", "--engine", choices=LIST_ENGINES, default="presto",
+                    help='Engine for ???, "hive" or "presto". By default "presto"')
+parser.add_argument("-f", "--format", choices=LIST_FORMAT, default="tabular",
+                    help='Output file format, "csv" or "tabular". By default "tabular"')
+parser.add_argument("-l", "--limit",
+                    help='"int"    Limit for rows output. By default unlimited', type=int)
+args = parser.parse_args()
 
-def check_arguments(db_name, table_name,
-               col_list=None, min_time=None, max_time=None, engine="presto", format_file="tabular", limit=None):
-    # Check required
-    if db_name is None:
-        print("DB name is required")
-    if table_name is None:
-        print("Table name is required")
-    # Then I drop app with this text (will think how to do it better)
+columns = "*"
+min_time = "NULL"
+max_time = "NULL"
+# Because we change type of variable, argparse deny this
+if args.min_time:
+    min_time = args.min_time
+    if min_time < MIN_MIN_TIME:
+        raise ValueError("MIN TIME should be more then " + str(MIN_MIN_TIME))
+if args.max_time:
+    max_time = args.max_time
+    if max_time < MIN_MAX_TIME:
+        raise ValueError("MAX TIME should be more then " + str(MIN_MAX_TIME))
+# Improve raise later
+if type(min_time) is int and type(max_time) is int and min_time >= max_time:
+    raise ValueError("MIN TIME should be less then MAX TIME")
+if args.col_list:
+    columns = args.col_list.split(",")
 
-    # For columns - there is no required separator
-    # Need to check somehow, if columns names are correct and then drop if not
-    if col_list is None:
-        columns = []
-    else:
-        columns = col_list.split(",")
-    # Later
 
-    # For time part
-    # Well, at least it works correct
-    # Because it is console input - we always expect String or None
-    # Check if user input min_time:
-    if min_time is not None:
-        if not(min_time[0] == '-' and min_time[1:].isdigit() or min_time.isdigit()):
-            print("Please, input correct number for min time - UNIX time required")
-        elif int(min_time) < MIN_MIN_TIME:
-            print("Min time should be larger then " + str(MIN_MIN_TIME))
-
-    # Check if user input max_time:
-    if max_time is not None:
-        if not(max_time[0] == '-' and max_time[1:].isdigit() or max_time.isdigit()):
-            print("Please, input correct number for max time - UNIX time required")
-        elif int(max_time) < MIN_MAX_TIME:
-            print("Max time should be larger then " + str(MIN_MAX_TIME))
-
-    # Sad, but I did not find beauty way to compare with None, so check it again for now
-    if min_time is not None and max_time is not None:
-        # Also we can expect the int here (because we check it in previous already)
-        # Probably change it later with the whole model (I still not sure which model to use)
-        if int(max_time) <= int(min_time):
-            print("Max time should be larger, then min time")
-
-    # Engine check
-    if engine not in LIST_ENGINES:
-        print("Unrecognised engine option")
-
-    # Format checks:
-    if format_file not in LIST_FORMAT:
-        print("Unrecognised file format")
-
-    # And limits
-    # Leave like this for now, think about it later
-    if not(limit[0] == '-' and limit[1:].isdigit() or limit.isdigit()):
-        print("Please, input correct number for limit")
-    elif int(max_time) < MIN_LIMIT:
-        print("Limit should be larger then " + str(MIN_LIMIT))
+print(args)
+print(columns)
+print(min_time)
+print(max_time)
