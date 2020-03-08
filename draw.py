@@ -23,7 +23,7 @@ if api_key is None:
     raise ValueError("API key was not setup properly")
 
 query_string = "SELECT * FROM " + table_name
-
+'''
 with tdclient.Client(api_key) as client:
     try:
         db = client.database(db_name)
@@ -52,6 +52,7 @@ with tdclient.Client(api_key) as client:
         for row in query_job.result():
             line = []
             for value in row:
+                BOOL_STRICT_COLUMNS
                 if type(value) is not dict:
                     line.append(value)
             table.append(line)
@@ -59,10 +60,23 @@ with tdclient.Client(api_key) as client:
     else:
         line = ''
         for row in query_job.result():
-            for value in row:
-                if type(value) is not dict:
-                    line += str(value) + ','
+            line += ','.join(str(item) for item in row if type(item) is not dict)
             line += '\n'
         print(line)
-
-
+'''
+'''
+if args.col_list:
+    columns = '('
+    for column in args.col_list.split(","):
+        if column not in schema:
+            print("There is no column " + column + " in this schema")
+            print("Maybe you want one of this?")
+            print(additonal_tools.tool_list_to_string(schema))
+            return -1
+        columns += ','.join(column)
+    columns += ')'
+    '''
+b = []
+a = ['asd', 'dsa']
+b.append(a)
+print(b)
