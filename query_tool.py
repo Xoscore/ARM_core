@@ -4,6 +4,7 @@ import tdclient
 import globals
 import additonal_tools
 import tabulate
+import time
 
 
 def main():
@@ -158,6 +159,7 @@ def main():
         print(query_string)
 
     # The query is checked and ready, so it's time to call for real DB
+    start_time = time.perf_counter()
     query_job = client.query(args.db_name, query_string, type=args.engine)
     query_job.wait()
     if query_job.error():
@@ -166,6 +168,8 @@ def main():
         return -1
     if debug:
         print('The job was finished with status "' + query_job.status() + '"')
+    if print_statistic:
+        print("The job takes " + str(time.perf_counter() - start_time) + " seconds to finish")
 
     result_count = 0
     # Start to output result
@@ -180,6 +184,10 @@ def main():
                     line.append(value)
             table.append(line)
             result_count += 1
+            if result_count >= globals.MAX_LINES_OUTPUT:
+                print("This is too large output to print it into console")
+                print("I will limit it by " + str(globals.MAX_LINES_OUTPUT))
+                break
         output = tabulate.tabulate(table, headers=header)
     elif args.format == "csv":
         output = ','.join(header) + '\n'
@@ -190,6 +198,10 @@ def main():
                 output += ','.join(str(item) for item in row if type(item) is not dict)
             output += '\n'
             result_count += 1
+            if result_count >= globals.MAX_LINES_OUTPUT:
+                print("This is too large output to print it into console")
+                print("I will limit it by " + str(globals.MAX_LINES_OUTPUT))
+                break
     else:
         print("Unrecognisable format")
         return -1
@@ -214,7 +226,12 @@ def main():
                     print('File "' + filename + '" was created')
 
     if print_statistic:
-        print(str(result_count) + " of result lines was in response")
+        # For size it does not tell size of what =(
+        # I expect bytes, but not sure
+        print("The size of response: " + str(query_job.result_size))
+        print("Total number of records: " + str(query_job.num_records))
+        print("Url to job: " + str(query_job.url))
+        print(str(result_count) + " of result lines was printed")
 
     # Yes, it is not great, to leave like this
     # But by curiocity, I run it on Nasdaq test table (500k rows) and it suddenly work! Although take some time

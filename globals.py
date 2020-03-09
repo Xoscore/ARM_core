@@ -15,6 +15,9 @@ LIST_POINT_TO = {
 MIN_MAX_TIME = 0
 MIN_MIN_TIME = 0
 
+# I need to limit output, because ore then 100 lines has no sense to output in console
+MAX_LINES_OUTPUT = 100
+
 # To print long lists in comfortable way, should be > 5
 MAX_PRINT_LIST_NUMBER = 10
 
