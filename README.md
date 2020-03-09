@@ -35,29 +35,28 @@ Both are just standart and can be installed by
 # Globals configuration
 
 **LIST_ENGINES** and **LIST_FORMAT** - 
-This is just list, what this program can do, to additional improvement
+This is just list, what this program can do, to additional improvement.
 
-**MIN_MAX_TIME** and **MIN_MIN_TIME** - I do not know the exact limitation of min/max time - it make sense to make it positive, but maybe 
-someone want to change it
+**MIN_MAX_TIME** and **MIN_MIN_TIME** - I do not know the exact limitation of min/max time - it make sense to make it positive, but maybe someone want to change it
 
-**MAX_LINES_OUTPUT** - Too large response is bad for console and, actually, does not make sense, so I limit it here by 100
-Although, it is directly overwriten by limit option from user
+**MAX_LINES_OUTPUT** - Too large response is bad for console and, actually, does not make sense, so I limit it here by 100. 
+Although, it is directly overwriten by limit option from user.
 
-**BOOL_WITH_KEY_CHECK** - I use standard way to feed the key to client, but it is possible to keep only one key this way
-  In additional, maybe someone want to run it from PC without key (but know it from other source)
-  So, with this option to True, it is possible to feed the key in console directly
+**BOOL_WITH_KEY_CHECK** - I use standard way to feed the key to client, but it is possible to keep only one key this way. 
+  In additional, maybe someone want to run it from PC without key (but know it from other source). 
+  So, with this option to True, it is possible to feed the key in console directly.
 
-**BOOL_WITH_FILE_OUTPUT** - There is no any sign of file output in requirements, but I think that it is much better this way
-Change this option to True - will add '--file' option to parser
-If this file option does not presented, nothing will change in behavior of program at all (same limits and output to console)
+**BOOL_WITH_FILE_OUTPUT** - There is no any sign of file output in requirements, but I think that it is much better this way. 
+Change this option to True - will add '--file' option to parser. 
+If this file option does not presented, nothing will change in behavior of program at all (same limits and output to console). 
 But if use it like '--file report_1', it write file instead of console output - and this time without any limitation 
 (500k from nasdq table is fine)
 
-**BOOL_WITH_MAP** - The 'hive' engine return 'map' in response
-I spent some time to understand why, but not get any info not in docs, not in library
-So, I just exclude it from result, but leave an option to get it back again
-Also it was made bad way, by 'dict' type, so any dict in response would be discarded
-But I cannot do it any better, without understand why it happens
+**BOOL_WITH_MAP** - The 'hive' engine return 'map' in response. 
+I spent some time to understand why, but not get any info not in docs, not in library. 
+So, I just exclude it from result, but leave an option to get it back again. 
+Also it was made bad way, by 'dict' type, so any dict in response would be discarded. 
+But I cannot do it any better, without understand why it happens.
 
 # Usage example
 
@@ -87,8 +86,8 @@ Limit has overwrite default limit to output - with debug turn on
 
 > $ py query_tool.py sample_datasets nasdaq -v -l 20000 --file report_3 -e hive
 
-Big peice of data will be add to file directly without console
-No debug, jsut statistic
+Big peice of data will be add to file directly without console. 
+No debug, jsut statistic. 
 Also hive used
 
 Failcases
