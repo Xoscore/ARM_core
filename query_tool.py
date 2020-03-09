@@ -145,11 +145,16 @@ def main():
 
     # And by last, let's check LIMIT
     limit = ''
+
     if args.limit:
         if args.limit < 0:
             print("LIMIT should be positive integer")
             return -1
         limit = " LIMIT " + str(args.limit)
+        # At first I limit it by global, but if user really want to raise it...
+        limit_output = args.limit
+    else:
+        limit_output = globals.MAX_LINES_OUTPUT
 
     # Let's collect the query to ask
     query_string = "SELECT " + columns + " FROM " + args.table_name + " WHERE TD_TIME_RANGE(time, " + str(min_time) + \
@@ -184,7 +189,8 @@ def main():
                     line.append(value)
             table.append(line)
             result_count += 1
-            if result_count >= globals.MAX_LINES_OUTPUT and not globals.BOOL_WITH_FILE_OUTPUT and not args.file:
+            # I can do it like this, because otherwise result cannot exceed limit
+            if result_count > limit_output and not globals.BOOL_WITH_FILE_OUTPUT and not args.file:
                 print("This is too large output to print it into console")
                 print("I will limit it by " + str(globals.MAX_LINES_OUTPUT))
                 break
@@ -198,7 +204,7 @@ def main():
                 output += ','.join(str(item) for item in row if type(item) is not dict)
             output += '\n'
             result_count += 1
-            if result_count >= globals.MAX_LINES_OUTPUT and not globals.BOOL_WITH_FILE_OUTPUT and not args.file:
+            if result_count > limit_output and not globals.BOOL_WITH_FILE_OUTPUT and not args.file:
                 print("This is too large output to print it into console")
                 print("I will limit it by " + str(globals.MAX_LINES_OUTPUT))
                 break
