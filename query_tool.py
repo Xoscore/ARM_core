@@ -184,7 +184,7 @@ def main():
                     line.append(value)
             table.append(line)
             result_count += 1
-            if result_count >= globals.MAX_LINES_OUTPUT:
+            if result_count >= globals.MAX_LINES_OUTPUT and not globals.BOOL_WITH_FILE_OUTPUT and not args.file:
                 print("This is too large output to print it into console")
                 print("I will limit it by " + str(globals.MAX_LINES_OUTPUT))
                 break
@@ -198,7 +198,7 @@ def main():
                 output += ','.join(str(item) for item in row if type(item) is not dict)
             output += '\n'
             result_count += 1
-            if result_count >= globals.MAX_LINES_OUTPUT:
+            if result_count >= globals.MAX_LINES_OUTPUT and not globals.BOOL_WITH_FILE_OUTPUT and not args.file:
                 print("This is too large output to print it into console")
                 print("I will limit it by " + str(globals.MAX_LINES_OUTPUT))
                 break
@@ -236,7 +236,10 @@ def main():
     # Yes, it is not great, to leave like this
     # But by curiocity, I run it on Nasdaq test table (500k rows) and it suddenly work! Although take some time
     # Well, I cannot expect that someone will run CLI to get 500k into pure console >_<
-    print(output)
+    if globals.BOOL_WITH_FILE_OUTPUT and args.file:
+        print("The result was writen into file - " + filename)
+    else:
+        print(output)
     return 0
 
 

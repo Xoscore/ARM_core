@@ -16,7 +16,7 @@ MAX_LINES_OUTPUT = 100
 BOOL_WITH_KEY_CHECK = False
 
 # If I want to output in file, not just on screen
-BOOL_WITH_FILE_OUTPUT = False
+BOOL_WITH_FILE_OUTPUT = True
 
 # SELECT * by Hive engine return map of the table and I do not know how to get rid of it (API reference is silent)
 # So, this bool is to switch if I should print it or not
