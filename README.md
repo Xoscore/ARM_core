@@ -1,17 +1,24 @@
 # Description
-This is the example program for exercise for Treasure Data
+This is the example program for exercise for Treasure Data.
+
 It is console utility, that get several arguments and output result directly into console
+
 It is writen on Python 3.7 Interpreter, but probably run on any 3.* version (I did not check, say that because no magic used)
 
 Main code lie in "query_tool.py" file
+
   One point - it is possible to split it onto several function or even make class and so on
+  
   But I did not see any reason to do it - it is just one pipeline with option, so let it be it like that in code
   
 To manage it behavior (because there are some additional options I want to add), I create file "globals.py"
+
 It should be placed in same folder as main file
 
 In additional, I add "additional_tools.py" with my piece of code from my hobby project
+
 Because I forgot to tell, that I have my python project as a hobby...
+
 It is tiny (because I start it just one month ago), but I try to keep useful things
 
 # Import
@@ -23,7 +30,7 @@ I use two libraries to make it
 
 Both are just standart and can be installed by 
 
-$ pip install tabulate, argparse
+> $ pip install tabulate, argparse
 
 # Globals configuration
 
@@ -54,31 +61,31 @@ But I cannot do it any better, without understand why it happens
 
 # Usage example
 
-$ py query_tool.py -h
+> $ py query_tool.py -h
 
 Print help of usage
 
-$ py query_tool.py test_db_2 test_table_2 -f tabular -c user_id,username
+> $ py query_tool.py test_db_2 test_table_2 -f tabular -c user_id,username
 
 Correct return for id and name from my table
 
-$ py query_tool.py test_db_2 test_table_2 -f csv -l 0 -vv -c user_id,username,
+> $ py query_tool.py test_db_2 test_table_2 -f csv -l 0 -vv -c user_id,username,
 
 Last comma in col_list is not a problem!
 
-$ py query_tool.py test_db_2 test_table_2 -f csv -l 0 -v -m 5 -M 10
+> $ py query_tool.py test_db_2 test_table_2 -f csv -l 0 -v -m 5 -M 10
 
 Although correct - this one does not return any result, but tell it in statistic file
 
-$ py query_tool.py test_db_2 test_table_2 -f csv -l 10 -vv -e presto
+> $ py query_tool.py test_db_2 test_table_2 -f csv -l 10 -vv -e presto
 
 Output as csv with debug, check that limit 0 is work (althout I did not get why, probably it comes from python library)
 
-$ py query_tool.py sample_datasets nasdaq -vv -l 1000
+> $ py query_tool.py sample_datasets nasdaq -vv -l 1000
 
 Limit has overwrite default limit to output - with debug turn on
 
-$ py query_tool.py sample_datasets nasdaq -v -l 20000 --file report_3 -e hive
+> $ py query_tool.py sample_datasets nasdaq -v -l 20000 --file report_3 -e hive
 
 Big peice of data will be add to file directly without console
 No debug, jsut statistic
@@ -86,19 +93,19 @@ Also hive used
 
 Failcases
 
-$ py query_tool.py asd asd -vv -l 1000
+> $ py query_tool.py asd asd -vv -l 1000
 
 It throw that database is incorrect
 
-$ py query_tool.py sample_datasets asd -vv -l 1000
+> $ py query_tool.py sample_datasets asd -vv -l 1000
 
 This one throw that table does not exist
 
-$ py query_tool.py test_db_2 test_table_2 -f csv -l 10 -vv -e presto -m 100 -M 10
+> $ py query_tool.py test_db_2 test_table_2 -f csv -l 10 -vv -e presto -m 100 -M 10
 
 Throw error about MAX < MIN
 
-$ py query_tool.py test_db_2 -f csv -l 10 -vv -e presto -m 100 -M 10
+> $ py query_tool.py test_db_2 -f csv -l 10 -vv -e presto -m 100 -M 10
 
 It throw error, because no table in input
 
