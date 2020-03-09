@@ -152,7 +152,8 @@ def main():
             return -1
         limit = " LIMIT " + str(args.limit)
         # At first I limit it by global, but if user really want to raise it...
-        limit_output = args.limit
+        if args.limit > 0:
+            limit_output = args.limit
     else:
         limit_output = globals.MAX_LINES_OUTPUT
 
