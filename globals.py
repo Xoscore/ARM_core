@@ -19,11 +19,13 @@ MIN_MIN_TIME = 0
 MAX_PRINT_LIST_NUMBER = 10
 
 # This set of options come not from requirements, but from my view of what I want from this app if make it for myself
-# If I want to put key on call, not on default
+# If I want to put key on call, not from system
 BOOL_WITH_KEY_CHECK = False
 
 # If I want to output in file, not just on screen
 BOOL_WITH_FILE_OUTPUT = False
 
-# Check if we return 'map' field from table
-BOOL_STRICT_COLUMNS = True
+# SELECT * by Hive engine return map of the table and I do not know how to get rid of it (API reference is silent)
+# So, this bool is to switch if I should print it or not
+BOOL_WITH_MAP = False
+

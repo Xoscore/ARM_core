@@ -34,7 +34,20 @@ def main():
                             help="Name of file to output")
     parser.add_argument("-l", "--limit",
                         help='Limit for rows output. By default unlimited', type=int)
+    parser.add_argument("-v", "--verbosity", action="count", default=0,
+                        help="increase output verbosity")
     args = parser.parse_args()
+
+    # I want to add some additional statistics and debug, if user want it
+    debug = False
+    print_statistic = False
+    if args.verbosity >= 2:
+        debug = True
+        print_statistic = True
+    elif args.verbosity >= 1:
+        print_statistic = True
+    else:
+        pass
 
     # At first, let's check, that user have key at all
     if globals.BOOL_WITH_KEY_CHECK:
@@ -73,12 +86,18 @@ def main():
     schema = []
     for column in table.schema:
         schema.append(column[0])
-    schema.append("UNIXTIME")
     # Check, if user make correct names of columns
-    header = schema
+    if globals.BOOL_WITH_MAP and args.engine == "hive":
+        schema.append("Map")
+    schema.append("UNIXTIME")
+    if debug:
+        print("Schema of table is: " + ','.join(schema))
+
     columns = ''
     if args.col_list:
         header = args.col_list.split(",")
+        if globals.BOOL_WITH_MAP and args.engine == "hive":
+            header.append("Map")
         for column in args.col_list.split(","):
             # Excluse last comma for comfort and check if name is correct
             if column != '':
@@ -93,8 +112,13 @@ def main():
                 columns += column + ','
         # I spent some time to find way to remove last comma, but fail, so let it be like this
         columns = columns[:-1]
+        if debug:
+            print("The columns to SELECT is: " + ','.join(columns))
     else:
+        header = schema
         columns = '*'
+        if debug:
+            print("SELECT return all columns (*)")
 
     # Let's check time now
     # Default values should be NULL
@@ -127,8 +151,11 @@ def main():
         limit = " LIMIT " + str(args.limit)
 
     # Let's collect the query to ask
-    query_string = "SELECT " + columns + " FROM " + args.table_name + " WHERE TD_TIME_RANGE(time, " + min_time + ", " \
-                   + max_time + ")" + limit
+    query_string = "SELECT " + columns + " FROM " + args.table_name + " WHERE TD_TIME_RANGE(time, " + str(min_time) + \
+                   ", " + str(max_time) + ")" + limit
+    if debug:
+        print("The query to DB is here:")
+        print(query_string)
 
     # The query is checked and ready, so it's time to call for real DB
     query_job = client.query(args.db_name, query_string, type=args.engine)
@@ -137,34 +164,37 @@ def main():
         print(query_string)
         print(query_job.debug['stderr'])
         return -1
+    if debug:
+        print('The job was finished with status "' + query_job.status() + '"')
 
-    output = ''
+    result_count = 0
     # Start to output result
     if args.format == "tabular":
         table = []
         for row in query_job.result():
             line = []
             for value in row:
-                if globals.BOOL_STRICT_COLUMNS:
-                    if type(value) is not dict:
-                        line.append(value)
-                else:
+                if globals.BOOL_WITH_MAP and args.engine == "hive":
+                    line.append(value)
+                elif type(value) is not dict:
                     line.append(value)
             table.append(line)
+            result_count += 1
         output = tabulate.tabulate(table, headers=header)
     elif args.format == "csv":
-        output = ','.join(schema) + '\n'
+        output = ','.join(header) + '\n'
         for row in query_job.result():
-            if globals.BOOL_STRICT_COLUMNS:
-                output += ','.join(str(item) for item in row if type(item) is not dict)
-            else:
+            if globals.BOOL_WITH_MAP and args.engine == "hive":
                 output += ','.join(str(item) for item in row)
+            else:
+                output += ','.join(str(item) for item in row if type(item) is not dict)
             output += '\n'
+            result_count += 1
     else:
         print("Unrecognisable format")
         return -1
 
-    # When we get result use this
+    # When we get result and need to output it to file, we use this
     if globals.BOOL_WITH_FILE_OUTPUT:
         if args.file is not None:
             filename = args.file
@@ -177,10 +207,20 @@ def main():
                     print("Unrecognisable file format")
                     return -1
             with open(filename, 'w') as file:
+                # I know, that this is weak point, because in general it is bad idea to put in file like this
+                # But it was not a part of exercise, and such improvements take a lot of times to implement
                 file.write(output)
-                pass
+                if debug:
+                    print('File "' + filename + '" was created')
 
+    if print_statistic:
+        print(str(result_count) + " of result lines was in response")
+
+    # Yes, it is not great, to leave like this
+    # But by curiocity, I run it on Nasdaq test table (500k rows) and it suddenly work! Although take some time
+    # Well, I cannot expect that someone will run CLI to get 500k into pure console >_<
     print(output)
     return 0
+
 
 main()
